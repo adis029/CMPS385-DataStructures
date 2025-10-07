@@ -1,0 +1,5 @@
+Name,Category,Quantity,Price
+Keyboard,Electronics,15,49.99
+Notebook,Stationery,50,2.49
+Toothpaste,Health,25,3.99
+Monitor,Electronics,10,129.99
