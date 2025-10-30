@@ -1,1 +1,200 @@
+// aditya singh
+// cmps 385
+// assignment 7
+// problem 1
+
+#include <iostream>
+#include <vector>
+#include <fstream>
+#include <sstream>
+#include <iomanip>
+using namespace std;
+
+struct Order {
+   string id;
+    string name;
+    string item;
+    int qty;
+    double price;
+    string status;//either chosen pending or served 
+};
+
+bool toInt(const string& s, int& out) {
+    stringstream ss(s);
+    ss >> out;
+    return !ss.fail();
+}
+
+// turned string to double
+bool toDouble(const string& s, double& out) {
+    stringstream ss(s);
+    ss >> out;
+    return !ss.fail();
+}
+
+// asked user for text
+void askText(const string& msg, string& v) {
+    cout << msg << endl;
+    getline(cin, v);
+    while (v.empty()) {
+        cout << "cant be empty try again" << endl;
+        getline(cin, v);
+    }
+}
+
+// ask user for a number above 0
+void askPosInt(const string& msg, int& v) {
+    string line;
+    cout << msg << endl;
+    getline(cin, line);
+    while (!toInt(line, v) || v <= 0) {
+        cout << "enter a number above 0" << endl;
+        getline(cin, line);
+    }
+}
+
+// ask user for price aboves 0
+void askNonNegDouble(const string& msg, double& v) {
+    string line;
+    cout << msg << endl;
+    getline(cin, line);
+    while (!toDouble(line, v) || v < 0) {
+        cout << "enter 0 or more" << endl;
+        getline(cin, line);
+    }
+}
+
+// load all orders from the files
+
+void loadOrders(vector<Order>& list) {
+    ifstream fin("orders.txt");
+    if (!fin.is_open()) return;
+    string skip;
+    getline(fin, skip);
+    string line;
+    while (getline(fin, line)) {
+        if (line.empty()) continue;
+        string id, name, item, q, p, t, st;
+        stringstream ss(line);
+        getline(ss, id, ',');
+        getline(ss, name, ',');
+        getline(ss, item, ',');
+        getline(ss, q, ',');
+        getline(ss, p, ',');
+        getline(ss, t, ',');
+        getline(ss, st, ',');
+
+        Order o;
+        o.id = id;
+        o.name = name;
+        o.item = item;
+        o.status = st.empty() ? "Pending" : st;
+        if (!toInt(q, o.qty)) continue;
+        if (!toDouble(p, o.price)) continue;
+        list.push_back(o);
+    }
+}
+
+// save all orders to file
+void saveOrders(vector<Order>& list) {
+    ofstream fout("orders.txt");
+    fout << "ID,Name,Item,Qty,Price,Total,Status\n";
+    for (auto& o : list) {
+        double total = o.qty * o.price;
+        fout << o.id << "," << o.name << "," << o.item << ","
+            << o.qty << "," << fixed << setprecision(2)
+            << o.price << "," << total << "," << o.status << "\n";
+    }
+}
+
+// make a new order
+void addOrder(vector<Order>& list) {
+    Order o;
+    askText("enter order id:", o.id);
+    askText("enter name:", o.name);
+    askText("enter item:", o.item);
+    askPosInt("enter qty:", o.qty);
+    askNonNegDouble("enter price:", o.price);
+    o.status = "Pending";
+    list.push_back(o);
+    cout << "order added" << endl;
+}
+
+// show all orders
+void showOrders(vector<Order>& list) {
+    cout << "id name item qty price total status" << endl;
+    for (auto& o : list) {
+        double total = o.qty * o.price;
+        cout << o.id << " " << o.name << " " << o.item << " "
+            << o.qty << " " << fixed << setprecision(2)
+            << o.price << " " << total << " " << o.status << endl;
+    }
+}
+
+// mark one as served
+void markServed(vector<Order>& list) {
+    cout << "enter id to mark served:" << endl;
+    string key;
+    getline(cin, key);
+    while (key.empty()) {
+        cout << "cant be empty" << endl;
+        getline(cin, key);
+    }
+    for (auto& o : list) {
+        if (o.id == key) {
+            if (o.status == "Pending") {
+                o.status = "Served";
+                cout << "order " << o.id << " marked served" << endl;
+            }
+            else {
+                cout << "already served" << endl;
+            }
+            return;
+        }
+    }
+    cout << "order not found" << endl;
+}
+
+// counting served and sales
+void summary(vector<Order>& list) {
+    int served = 0;
+    double sales = 0;
+    for (auto& o : list) {
+        if (o.status == "Served") {
+            served++;
+            sales += o.qty * o.price;
+        }
+    }
+    cout << "total: " << list.size() << endl;
+    cout << "served: " << served << endl;
+    cout << "pending: " << list.size() - served << endl;
+    cout << "sales:$" << fixed << setprecision(2) << sales << endl;
+}
+
+
+
+
+
+int main() {
+    vector<Order> list;
+    loadOrders(list);
+    cout << "welcome to restaurant order manager" << endl;
+    int choice = 0;
+    while (choice != 5) {
+        cout << "1 add order\n2 show all\n3 mark served\n4 summary\n5 exit\n";
+        string line;
+        getline(cin, line);
+        if (!toInt(line, choice)) choice = 0;
+        if (choice == 1) addOrder(list);
+        else if (choice == 2) showOrders(list);
+        else if (choice == 3) markServed(list);
+        else if (choice == 4) summary(list);
+        else if (choice == 5) {
+            saveOrders(list);
+            cout << "saved to orders.txt" << endl;
+        }
+        else cout << "invalid" << endl;
+    }
+    return 0;
+}
 
