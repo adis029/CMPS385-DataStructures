@@ -1,1 +1,203 @@
+// Aditya Singh
+// CMPS 385
+// Assignment 7
+// Problem 2
+
+#include <iostream>
+#include <fstream>
+#include <list>
+#include <sstream>
+#include <iomanip>
+using namespace std;
+
+struct Patient {
+    string id;
+    string name;
+    string level;
+    int wait;
+    string status; // either waiting or admitted
+};
+
+// changes text to integer
+bool toInt(string s, int& out) {
+    stringstream ss(s);
+    ss >> out;
+    return !ss.fail();
+}
+
+// asks user for text input
+void askText(string msg, string& val) {
+    cout << msg << endl;
+    getline(cin, val);
+    while (val.empty()) {
+        cout << "please reinput cannot be empty" << endl;
+        getline(cin, val);
+    }
+}
+
+// asks user for number
+void askInt(string msg, int& val) {
+    string line;
+    cout << msg << endl;
+    getline(cin, line);
+    while (!toInt(line, val) || val < 0) {
+        cout << "enter 0 or more please" << endl;
+        getline(cin, line);
+    }
+}
+
+// loads all saved patients(here txt) 
+// elsewhere csv depending on file chosen and used
+void loadPatients(list<Patient>& lst) {
+    ifstream fin("patients.txt");
+    if (!fin.is_open()) return;
+
+    string header;
+    getline(fin, header);
+
+    string line;
+    while (getline(fin, line)) {
+        if (line.empty()) continue;
+
+        string id, name, level, waitText, status;
+        stringstream ss(line);
+        getline(ss, id, ',');
+        getline(ss, name, ',');
+        getline(ss, level, ',');
+        getline(ss, waitText, ',');
+        getline(ss, status, ',');
+
+        Patient p;
+        p.id = id;
+        p.name = name;
+        p.level = level;
+
+        if (status.empty()) {
+            p.status = "Waiting";
+        }
+        else {
+            p.status = status;
+        }
+
+        if (!toInt(waitText, p.wait)) continue;
+        lst.push_back(p);
+    }
+}
+
+
+// saves patients to file 
+void savePatients(list<Patient>& lst) {
+    ofstream fout("patients.txt");
+    fout << "ID,Name,Level,Wait,Status\n";
+
+    for (auto& p : lst) {
+        fout << p.id << "," << p.name << "," << p.level << ","
+            << p.wait << "," << p.status << "\n";
+    }
+}
+
+// adds new patient 
+void addPatient(list<Patient>& lst) {
+    Patient p;
+    askText("enter id:", p.id);
+    askText("enter name:", p.name);
+    askText("enter condition (low/medium/high/critical):", p.level);
+    askInt("enter wait time:", p.wait);
+    p.status = "Waiting";
+    lst.push_back(p);
+    cout << "added" << endl;
+}
+
+// shows all patients
+void showPatients(list<Patient>& lst) {
+    cout << "id name level wait status" << endl;
+    for (auto& p : lst) {
+        cout << p.id << " " << p.name << " " << p.level << " "
+            << p.wait << " " << p.status << endl;
+    }
+}
+
+// admits the first waiting patient
+void admitPatient(list<Patient>& lst) {
+    for (auto& p : lst) {
+        if (p.status == "Waiting") {
+            p.status = "Admitted";
+            cout << "patient " << p.id << " admitted" << endl;
+            return;
+        }
+    }
+    cout << "no waiting patients" << endl;
+}
+
+// shows summary of all variables(total,waiting,admitted,sum times of waiting)
+void summary(list<Patient>& lst) {
+    int total = 0;
+    int admitted = 0;
+    int waiting = 0;
+    int sumWait = 0;
+
+    for (auto& p : lst) {
+        total++;
+        if (p.status == "Admitted") {
+            admitted++;
+        }
+        else if (p.status == "Waiting") {
+            waiting++;
+            sumWait += p.wait;
+        }
+    }
+
+    double avg = 0;
+    if (waiting > 0) {
+        avg = (double)sumWait / waiting;
+    }
+
+    cout << "total: " << total << endl;
+    cout << "admitted: " << admitted << endl;
+    cout << "waiting: " << waiting << endl;
+    cout << "avg wait: " << fixed << setprecision(2) << avg << endl;
+}
+
+int main() {
+    list<Patient> lst;
+    loadPatients(lst);
+
+    cout << "welcome to er queue manager" << endl;
+
+    int choice = 0;
+    while (choice != 5) {
+        cout << "1 add patient" << endl
+            << "2 show all" << endl
+            << "3 admit" << endl
+            << "4 summary" << endl
+            << "5 exit" << endl;
+
+        string line;
+        getline(cin, line);
+
+        if (!toInt(line, choice)) {
+            choice = 0;
+        }
+        if (choice == 1) {
+            addPatient(lst);
+        }
+        else if (choice == 2) {
+            showPatients(lst);
+        }
+        else if (choice == 3) {
+            admitPatient(lst);
+        }
+        else if (choice == 4) {
+            summary(lst);
+        }
+        else if (choice == 5) {
+            savePatients(lst);
+            cout << "saved to patients.txt" << endl;
+        }
+        else {
+            cout << "invalid" << endl;
+        }
+    }
+    return 0;
+}
 
