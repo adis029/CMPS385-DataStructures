@@ -25,7 +25,7 @@ struct Date {
 };
 struct Appointment {
     int id;        // auto-generated
-    string name;   // person’s name
+    string name;   // personâ€™s name
     Date date;     // appointment date
     string purpose;// reason for visit
 };
