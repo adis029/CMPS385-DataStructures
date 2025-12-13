@@ -1,4 +1,4 @@
-﻿//CMPS 385- Data Structures
+//CMPS 385- Data Structures
 //Aditya Singh
 //Assignment 8 Problem 3
 
