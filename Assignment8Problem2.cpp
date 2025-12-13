@@ -65,7 +65,7 @@ int main() {
         cout << "4.Play Previous Song\n";
         cout << "5.Remove Song\n";
         cout << "6.Save and Exit\n";
-        cout << "Please choose a number 1-5 PLEASE! ";
+        cout << "Please choose a number 1-6 PLEASE! ";
 
         cin >> choice;
         cin.ignore();  
@@ -334,6 +334,7 @@ void removeSong() {
     cout << "Song '" << temp->title << "' removed from playlist.\n";
     delete temp;
 }
+
 
 
 
