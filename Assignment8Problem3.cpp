@@ -12,16 +12,11 @@
 #include <string>
 
 using namespace std;
-
-
-
 //Struct of Traffic Light 
-
 // Each node represents one road and its traffic lights
 // The next pointer connects its nodes in a circular manner
 
 struct TrafficLight {
-
     int id;                 
     string roadName;         
     string color;             // Colors mimics real life, green,yellow,red
@@ -29,17 +24,14 @@ struct TrafficLight {
 };
 
 //Global poitners 
-
 TrafficLight* first = nullptr;      //first road or light 
 TrafficLight* current = nullptr;   // active light(current)
 
 //Function declartions 
-
 void addLight();
 void displaySequence();
 void advanceLight();
 void resetSystem();
-
 
 int main() {
 
@@ -81,7 +73,6 @@ int main() {
 
     return 0;
 }
-
 //ALL FUNCTIONS BELOW
 
 //Function Addlight (adds a new road or light at end of list if list is empty
@@ -126,7 +117,6 @@ void addLight() {
     cout << "Traffic light has been added for " << newLight->roadName;
 
 }
-
 
 //Function Display Sequence - Displays circular paths list starting from first and loops exactly once through all circles
 
@@ -213,4 +203,5 @@ void resetSystem() {
 
     cout << "System has now been reset Thank you for using this program. \n";
 }
+
 
